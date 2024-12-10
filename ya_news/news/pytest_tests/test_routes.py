@@ -17,10 +17,8 @@ from .conftest import ADMIN_CLIENT, ANONYMOUS, AUTHOR_CLIENT
         (lazy_fixture('signup_url'), ANONYMOUS, HTTPStatus.OK),
         (lazy_fixture('delete_comment_url'), AUTHOR_CLIENT, HTTPStatus.OK),
         (lazy_fixture('edit_comment_url'), AUTHOR_CLIENT, HTTPStatus.OK),
-        (lazy_fixture('delete_comment_url'),
-         ADMIN_CLIENT,
-         HTTPStatus.NOT_FOUND
-         ),
+        (lazy_fixture('delete_comment_url'), ADMIN_CLIENT,
+         HTTPStatus.NOT_FOUND),
         (lazy_fixture('edit_comment_url'), ADMIN_CLIENT, HTTPStatus.NOT_FOUND),
     )
 )

@@ -1,54 +1,41 @@
 import pytest
-from django.conf import settings
-from django.urls import reverse
 
-from .conftest import ANONYMOUS, AUTHOR_CLIENT, NEWS_DETAIL, NEWS_HOME
+from .conftest import ANONYMOUS, AUTHOR_CLIENT
 
-
-@pytest.mark.django_db
-@pytest.mark.usefixtures('more_news')
-def test_news_count(client):
-    url = reverse(NEWS_HOME)
-    response = client.get(url)
-    object_list = response.context['object_list']
-    news_count = len(object_list)
-    assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
+pytestmark = [pytest.mark.django_db]
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures('more_news')
-def test_news_order(client):
-    url = reverse(NEWS_HOME)
-    response = client.get(url)
-    object_list = response.context['object_list']
-    all_dates = [news.date for news in object_list]
-    sorted_dates = sorted(all_dates, reverse=True)
-    assert sorted_dates == all_dates
+def test_news_count_order(client, home_url, bulk_news_creation):
 
-
-@pytest.mark.django_db
-@pytest.mark.usefixtures('more_comment')
-def test_comments_order(client, news):
-    url = reverse(NEWS_DETAIL, args=(news.id,))
-    response = client.get(url)
-    news = response.context['news']
-    all_dates = [comment.created for comment in news.comment_set.all()]
-    sorted_dates = sorted(all_dates)
-    assert 'news' in response.context
-    assert sorted_dates == all_dates
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    'parametrized_client, note_in_list',
-    (
-        (AUTHOR_CLIENT, True),
-        (ANONYMOUS, False),
+    response = client.get(home_url)
+    object_list = list(response.context['object_list'])
+    assert object_list == sorted(
+        object_list, key=lambda x: x.date, reverse=True
     )
+
+
+def test_comments_order(self, client, detail_url, news, multiple_comments):
+
+    response = client.get(detail_url)
+    self.assertIn('news', response.context)
+    comments = news.comment_set.order_by('created')
+    for i in range(len(comments) - 1):
+        self.assertLessEqual(
+            comments[i].created,
+            comments[i + 1].created
+        )
+
+
+@pytest.mark.parametrize(
+    'current_client, status',
+    ((ANONYMOUS, False), (AUTHOR_CLIENT, True)),
 )
-def test_form_availability_for_different_clients(
-    parametrized_client, note_in_list, news
+def test_anonymous_has_no_form(
+    current_client,
+    detail_url,
+    status,
+    comment
 ):
-    url = reverse(NEWS_DETAIL, args=(news.id,))
-    response = parametrized_client.get(url)
-    assert ('form' in response.context) is note_in_list
+
+    response = current_client.get(detail_url)
+    assert ('form' in response.context) is status

@@ -1,42 +1,83 @@
 from http import HTTPStatus
 
-from django.urls import reverse
+from django.contrib.auth import get_user_model
+from notes.tests.base_test import BaseTest
 
-from ya_note.notes.tests.base_test import BaseTest
+User = get_user_model()
 
 
 class TestRoutes(BaseTest):
 
-    def test_availability_pages(self):
-        urls = (
-            [self.url_home, self.anonimous, HTTPStatus.OK],
-            [self.url_login, self.anonimous, HTTPStatus.OK],
-            [self.url_logout, self.anonimous, HTTPStatus.OK],
-            [self.url_sign_up, self.anonimous, HTTPStatus.OK],
-            [self.url_detail, self.author, HTTPStatus.OK],
-            [self.url_delete, self.author, HTTPStatus.OK],
-            [self.url_edit, self.author, HTTPStatus.OK],
-            [self.url_detail, self.reader, HTTPStatus.NOT_FOUND],
-            [self.url_delete, self.reader, HTTPStatus.NOT_FOUND],
-            [self.url_edit, self.reader, HTTPStatus.NOT_FOUND],
-            [self.url_succes, self.author, HTTPStatus.FOUND],
-            [self.url_add, self.author, HTTPStatus.FOUND],
-            [self.url_list, self.author, HTTPStatus.FOUND],
-        )
-        for url, user, status in urls:
-            with self.subTest(user=user, name=url):
-                url = reverse(url)
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, status)
+    def test_pages_availability(self):
 
-    def test_redirect_anonymous_client(self):
-        urls = (self.url_list,
-                self.url_detail,
+        urls = (
+            (self.url_home, self.client, HTTPStatus.OK, self.ANONYMOUS),
+            (self.url_login, self.client, HTTPStatus.OK, self.ANONYMOUS),
+            (self.url_logout, self.client, HTTPStatus.OK, self.ANONYMOUS),
+            (self.url_sign_up, self.client, HTTPStatus.OK, self.ANONYMOUS),
+            (self.url_detail, self.author_client, HTTPStatus.OK, self.AUTHOR),
+            (
                 self.url_edit,
+                self.author_client,
+                HTTPStatus.OK,
+                self.AUTHOR,
+            ),
+            (
+                self.url_delete,
+                self.author_client,
+                HTTPStatus.OK,
+                self.AUTHOR,
+            ),
+            (
                 self.url_add,
-                self.url_delete)
+                self.reader_client,
+                HTTPStatus.OK,
+                self.READER,
+            ),
+            (
+                self.url_success,
+                self.reader_client,
+                HTTPStatus.OK,
+                self.READER,
+            ),
+            (self.url_list, self.reader_client, HTTPStatus.OK, self.READER),
+            (
+                self.url_detail,
+                self.reader_client,
+                HTTPStatus.NOT_FOUND,
+                self.READER,
+            ),
+            (
+                self.url_edit,
+                self.reader_client,
+                HTTPStatus.NOT_FOUND,
+                self.READER,
+            ),
+            (
+                self.url_delete,
+                self.reader_client,
+                HTTPStatus.NOT_FOUND,
+                self.READER,
+            ),
+        )
+        for current_url, current_client, status, user in urls:
+            with self.subTest():
+                self.assertEqual(
+                    current_client.get(current_url).status_code, status
+                )
+
+    def test_redirects(self):
+
+        urls = (
+            self.url_add,
+            self.url_success,
+            self.url_detail,
+            self.url_edit,
+            self.url_delete,
+            self.url_list,
+        )
         for url in urls:
-            with self.subTest(name=url):
+            with self.subTest():
                 redirect_url = f'{self.url_login}?next={url}'
                 response = self.client.get(url)
                 self.assertRedirects(response, redirect_url)

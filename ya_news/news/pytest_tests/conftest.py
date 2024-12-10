@@ -4,21 +4,23 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from pytest_lazyfixture import lazy_fixture
-
 from news.models import Comment, News
+from pytest_lazyfixture import lazy_fixture
 
 ADMIN_CLIENT = lazy_fixture('admin_client')
 AUTHOR_CLIENT = lazy_fixture('author_client')
 ANONYMOUS = lazy_fixture('client')
-NEWS = lazy_fixture('news')
-NEWS_DETAIL = 'news:detail'
-NEWS_HOME = 'news:home'
+
 TITLE = 'Заголовок'
 TEXT = 'Текст'
 NEW_TEXT = 'Новый текст'
-COMMENTS_COUNT = 3
 COUNT_ADD = 1
+COMMENTS_COUNT = 3
+
+
+@pytest.fixture(autouse=True)
+def add_db_for_all_tests(db):
+    pass
 
 
 @pytest.fixture
@@ -54,11 +56,10 @@ def reader_client(reader, client):
 @pytest.fixture
 def new(author):
 
-    news = News.objects.create(
+    return News.objects.create(
         title=TITLE,
         text=TEXT,
     )
-    return news
 
 
 @pytest.fixture
@@ -69,25 +70,24 @@ def bulk_news_creation(author):
             title=f'{TITLE} {index}',
             text=TEXT,
         )
-        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + COUNT_ADD)
     )
 
 
 @pytest.fixture
 def comment(author, new):
 
-    comment = Comment.objects.create(
+    return Comment.objects.create(
         author=author,
         news=new,
         text=TEXT
     )
-    return comment
 
 
 @pytest.fixture
 def multiply_comments(author, new):
 
-    for index in range(5):
+    for index in range(COMMENTS_COUNT):
         comment = Comment.objects.create(
             author=author,
             news=new,
