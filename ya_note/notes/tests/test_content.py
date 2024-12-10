@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 
-from ya_note.notes.tests.base_test import BaseTest
+from notes.forms import NoteForm
+from notes.tests.base_test import BaseTest
 
 User = get_user_model()
 
@@ -16,7 +17,7 @@ class TestContent(BaseTest):
             with self.subTest():
                 response = user.get(self.url_list)
                 object_list = response.context['object_list']
-                self.assertIs((self.notes in object_list), value)
+                self.assertIs((self.note in object_list), value)
 
     def test_create_and_add_note_pages_contains_form(self):
         urls = (
@@ -27,3 +28,4 @@ class TestContent(BaseTest):
             with self.subTest(name=url):
                 response = self.author_client.get(url)
                 self.assertIn('form', response.context)
+                self.assertIsInstance(response.context['form'], NoteForm)

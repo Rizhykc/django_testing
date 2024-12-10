@@ -26,20 +26,24 @@ class BaseTest(TestCase):
         cls.reader = User.objects.create(username=cls.READER)
         cls.reader_client = Client()
         cls.reader_client.force_login(cls.reader)
-        cls.notes = Note.objects.create(title=cls.TITLE,
-                                        text=cls.TEXT, slug=cls.SLUG,
-                                        author=cls.author)
-        cls.form_data = {'text': cls.NEW_TEXT,
-                         'title': cls.NEW_TITLE,
-                         'slug': cls.NEW_SLUG}
+        cls.note = Note.objects.create(
+            author=cls.author,
+            slug=cls.SLUG,
+            title=cls.TITLE,
+            text=cls.TEXT,
+        )
+        cls.form_data = {
+            'title': cls.NEW_TITLE,
+            'text': cls.NEW_TEXT,
+            'slug': cls.NEW_SLUG
+        }
+        cls.url_home = reverse('notes:home')
         cls.url_add = reverse('notes:add')
-        cls.url_success = reverse('notes:succes')
-        cls.url_delete = reverse('notes:delete', args=(cls.SLUG,))
+        cls.url_success = reverse('notes:success')
         cls.url_detail = reverse('notes:detail', args=(cls.SLUG,))
         cls.url_edit = reverse('notes:edit', args=(cls.SLUG,))
-        cls.url_home = reverse('notes:home')
+        cls.url_delete = reverse('notes:delete', args=(cls.SLUG,))
         cls.url_list = reverse('notes:list')
         cls.url_login = reverse('users:login')
         cls.url_logout = reverse('users:logout')
-        cls.url_sign_up = reverse('users:signup')
-        cls.url_succes = reverse('notes:success')
+        cls.url_signup = reverse('users:signup')

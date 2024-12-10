@@ -14,16 +14,13 @@ def test_news_count_order(client, home_url, bulk_news_creation):
     )
 
 
-def test_comments_order(self, client, detail_url, news, multiple_comments):
+def test_comments_order(client, detail_url, new, multiply_comments):
 
     response = client.get(detail_url)
-    self.assertIn('news', response.context)
-    comments = news.comment_set.order_by('created')
-    for i in range(len(comments) - 1):
-        self.assertLessEqual(
-            comments[i].created,
-            comments[i + 1].created
-        )
+    new = response.context['news']
+    all_comments = list(new.comment_set.all())
+    assert 'news' in response.context
+    assert all_comments == sorted(all_comments, key=lambda x: x.created)
 
 
 @pytest.mark.parametrize(
