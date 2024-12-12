@@ -4,8 +4,12 @@ import pytest
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from news.models import Comment, News
 from pytest_lazyfixture import lazy_fixture
+
+from news.models import Comment, News
+
+# from django.test import Client
+
 
 ADMIN_CLIENT = lazy_fixture('admin_client')
 AUTHOR_CLIENT = lazy_fixture('author_client')

@@ -1,9 +1,10 @@
 from http import HTTPStatus
 
+from pytest_django.asserts import assertFormError, assertRedirects
+
 from news.forms import BAD_WORDS, WARNING
 from news.models import Comment
 from news.pytest_tests.conftest import NEW_TEXT, TEXT
-from pytest_django.asserts import assertFormError, assertRedirects
 
 
 def test_user_can_create_comment(

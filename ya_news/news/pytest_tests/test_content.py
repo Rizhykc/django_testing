@@ -2,8 +2,6 @@ import pytest
 
 from .conftest import ANONYMOUS, AUTHOR_CLIENT
 
-pytestmark = [pytest.mark.django_db]
-
 
 def test_news_count_order(client, home_url, bulk_news_creation):
 
