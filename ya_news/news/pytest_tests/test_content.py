@@ -44,6 +44,6 @@ def test_anonymous_has_no_form(
 
     response = current_client.get(detail_url)
     form_in_context = 'form' in response.context
+    assert form_in_context is status
     if form_in_context:
         assert isinstance(response.context['form'], CommentForm)
-    assert form_in_context is status

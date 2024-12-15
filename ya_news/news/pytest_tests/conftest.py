@@ -69,13 +69,13 @@ def new(author):
 @pytest.fixture
 def bulk_news_creation(author):
 
-    return News.objects.bulk_create([
+    return News.objects.bulk_create(
         News(
             title=f'{TITLE} {i}',
             text=TEXT,
             date=datetime.datetime.now() + datetime.timedelta(minutes=i)
         ) for i in range(NEWS_COUNT)
-    ])
+    )
 
 
 @pytest.fixture

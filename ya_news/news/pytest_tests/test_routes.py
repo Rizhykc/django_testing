@@ -1,7 +1,6 @@
 from http import HTTPStatus as HTTPs
 
 import pytest
-from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 from pytest_lazyfixture import lazy_fixture as lf
 
@@ -15,32 +14,27 @@ from .conftest import ADMIN_CLIENT, ANONYMOUS, AUTHOR_CLIENT
         (lf('login_url'), ANONYMOUS, HTTPs.OK),
         (lf('logout_url'), ANONYMOUS, HTTPs.OK),
         (lf('signup_url'), ANONYMOUS, HTTPs.OK),
-        (None, AUTHOR_CLIENT, HTTPs.OK),
-        (None, AUTHOR_CLIENT, HTTPs.OK),
-        (None, ADMIN_CLIENT, HTTPs.NOT_FOUND),
-        (None, ADMIN_CLIENT, HTTPs.NOT_FOUND),
+        (lf('delete_comment_url'), AUTHOR_CLIENT, HTTPs.OK),
+        (lf('edit_comment_url'), AUTHOR_CLIENT, HTTPs.OK),
+        (lf('delete_comment_url'), ADMIN_CLIENT, HTTPs.NOT_FOUND),
+        (lf('edit_comment_url'), ADMIN_CLIENT, HTTPs.NOT_FOUND),
     )
 )
 def test_pages_availability_for_users(url, current_client, status, comment):
-    if url is None:
-        comment_id = comment.id
-        url = reverse(f'news:{"edit" if status == HTTPs.OK else "delete"}',
-                      args=(comment_id,))
+
     response = current_client.get(url)
     assert response.status_code == status
 
 
 @pytest.mark.parametrize(
-    'url',
-    [
-        'news:edit',
-        'news:delete',
-    ]
+    'url', (``
+        lf('delete_comment_url'),
+        lf('edit_comment_url'),
+    )
 )
-def test_redirects(client, url, comment, login_url):
-
+def test_redirects(client, url, login_url):
     login = login_url
-    url = reverse(url, args=(comment.id,))
-    expected_url = f'{login}?next={url}'
-    response = client.get(url)
+    actual_url = url
+    expected_url = f'{login}?next={actual_url}'
+    response = client.get(actual_url)
     assertRedirects(response, expected_url)

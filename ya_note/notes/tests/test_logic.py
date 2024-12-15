@@ -10,7 +10,7 @@ from notes.tests.base_test import BaseTest
 class TestNoteCreation(BaseTest):
 
     def test_user_can_create_note(self):
-
+        Note.objects.all().delete()
         initial_notes_count = Note.objects.count()
         response = self.author_client.post(
             self.url_add, data=self.form_data
@@ -18,9 +18,11 @@ class TestNoteCreation(BaseTest):
         self.assertRedirects(response, self.url_success)
         new_notes_count = Note.objects.count()
         self.assertEqual(new_notes_count, initial_notes_count + 1)
-        note = Note.objects.latest('id')
+        note = Note.objects.get()
         self.assertEqual(note.text, self.form_data['text'])
         self.assertEqual(note.author, self.author)
+        self.assertEqual(note.title, self.form_data['title'])
+        self.assertEqual(note.slug, self.form_data['slug'])
 
     def test_anonymous_cant_create_note(self):
 
@@ -53,7 +55,7 @@ class TestNoteCreation(BaseTest):
         )
         self.assertRedirects(response, self.url_success)
         self.assertEqual(Note.objects.count(), 1)
-        new_note = Note.objects.first()
+        new_note = Note.objects.get()
         self.assertEqual(new_note.slug, slugify(self.form_data['title']))
         self.assertEqual(new_note.title, self.form_data['title'])
 
@@ -67,7 +69,7 @@ class TestNoteCreation(BaseTest):
         self.assertEqual(updated_note.text, self.form_data['text'])
         self.assertEqual(updated_note.title, self.form_data['title'])
         self.assertEqual(updated_note.slug, self.form_data['slug'])
-        self.assertEqual(updated_note.author, self.author)
+        self.assertEqual(updated_note.author, self.note.author)
 
     def test_author_can_delete_note(self):
 

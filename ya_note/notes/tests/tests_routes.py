@@ -13,49 +13,16 @@ class TestRoutes(BaseTest):
             (self.url_logout, self.client, HTTPs.OK, self.ANONYMOUS),
             (self.url_signup, self.client, HTTPs.OK, self.ANONYMOUS),
             (self.url_detail, self.author_client, HTTPs.OK, self.AUTHOR),
-            (
-                self.url_edit,
-                self.author_client,
-                HTTPs.OK,
-                self.AUTHOR,
-            ),
-            (
-                self.url_delete,
-                self.author_client,
-                HTTPs.OK,
-                self.AUTHOR,
-            ),
-            (
-                self.url_add,
-                self.reader_client,
-                HTTPs.OK,
-                self.READER,
-            ),
-            (
-                self.url_success,
-                self.reader_client,
-                HTTPs.OK,
-                self.READER,
-            ),
+            (self.url_edit, self.author_client, HTTPs.OK, self.AUTHOR),
+            (self.url_delete, self.author_client, HTTPs.OK, self.AUTHOR),
+            (self.url_add, self.reader_client, HTTPs.OK, self.READER),
+            (self.url_success, self.reader_client, HTTPs.OK, self.READER),
             (self.url_list, self.reader_client, HTTPs.OK, self.READER),
-            (
-                self.url_detail,
-                self.reader_client,
-                HTTPs.NOT_FOUND,
-                self.READER,
-            ),
-            (
-                self.url_edit,
-                self.reader_client,
-                HTTPs.NOT_FOUND,
-                self.READER,
-            ),
-            (
-                self.url_delete,
-                self.reader_client,
-                HTTPs.NOT_FOUND,
-                self.READER,
-            ),
+            (self.url_detail, self.reader_client, HTTPs.NOT_FOUND,
+             self.READER),
+            (self.url_edit, self.reader_client, HTTPs.NOT_FOUND, self.READER),
+            (self.url_delete, self.reader_client, HTTPs.NOT_FOUND,
+             self.READER),
         )
         for current_url, current_client, status, user in urls:
             with self.subTest(
