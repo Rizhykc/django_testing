@@ -1,7 +1,6 @@
 import pytest
 
 from news.forms import CommentForm
-
 from .conftest import ANONYMOUS, AUTHOR_CLIENT, NEWS_COUNT
 
 

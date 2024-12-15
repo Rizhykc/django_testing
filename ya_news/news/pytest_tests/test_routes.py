@@ -33,8 +33,7 @@ def test_pages_availability_for_users(url, current_client, status, comment):
     )
 )
 def test_redirects(client, url, login_url):
-    login = login_url
     actual_url = url
-    expected_url = f'{login}?next={actual_url}'
+    expected_url = f'{login_url}?next={actual_url}'
     response = client.get(actual_url)
     assertRedirects(response, expected_url)
