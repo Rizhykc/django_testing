@@ -27,7 +27,7 @@ def test_pages_availability_for_users(url, current_client, status, comment):
 
 
 @pytest.mark.parametrize(
-    'url', (``
+    'url', (
         lf('delete_comment_url'),
         lf('edit_comment_url'),
     )

@@ -42,7 +42,7 @@ class BaseTest(TestCase):
         cls.url_add = reverse('notes:add')
         cls.url_success = reverse('notes:success')
         cls.url_detail = reverse('notes:detail', args=(cls.note.slug,))
-        cls.url_edit = reverse('notes:edit',args=(cls.note.slug,))
+        cls.url_edit = reverse('notes:edit', args=(cls.note.slug,))
         cls.url_delete = reverse('notes:delete', args=(cls.note.slug,))
         cls.url_list = reverse('notes:list')
         cls.url_login = reverse('users:login')
