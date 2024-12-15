@@ -1,15 +1,12 @@
-from datetime import timedelta
+import datetime
 
 import pytest
-from django.conf import settings
+from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
 from pytest_lazyfixture import lazy_fixture
 
 from news.models import Comment, News
-
-# from django.test import Client
-
 
 ADMIN_CLIENT = lazy_fixture('admin_client')
 AUTHOR_CLIENT = lazy_fixture('author_client')
@@ -17,9 +14,10 @@ ANONYMOUS = lazy_fixture('client')
 
 TITLE = 'Заголовок'
 TEXT = 'Текст'
-NEW_TEXT = 'Новый текст'
 COUNT_ADD = 1
 COMMENTS_COUNT = 3
+NEW_COMMENT = {'text': 'Новый текст'}
+NEWS_COUNT = 10
 
 
 @pytest.fixture(autouse=True)
@@ -36,10 +34,11 @@ def author(django_user_model):
 
 
 @pytest.fixture
-def author_client(author, client):
+def author_client(author, django_db_setup):
 
+    client = Client()
     client.force_login(author)
-    return client
+    yield client
 
 
 @pytest.fixture
@@ -51,10 +50,11 @@ def reader(django_user_model):
 
 
 @pytest.fixture
-def reader_client(reader, client):
+def reader_client(reader, django_db_setup):
 
+    client = Client()
     client.force_login(reader)
-    return client
+    yield client
 
 
 @pytest.fixture
@@ -69,13 +69,13 @@ def new(author):
 @pytest.fixture
 def bulk_news_creation(author):
 
-    return News.objects.bulk_create(
+    return News.objects.bulk_create([
         News(
-            title=f'{TITLE} {index}',
+            title=f'{TITLE} {i}',
             text=TEXT,
-        )
-        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + COUNT_ADD)
-    )
+            date=datetime.datetime.now() + datetime.timedelta(minutes=i)
+        ) for i in range(NEWS_COUNT)
+    ])
 
 
 @pytest.fixture
@@ -97,13 +97,8 @@ def multiply_comments(author, new):
             news=new,
             text=f'{TEXT} {index}',
         )
-        comment.created = timezone.now() + timedelta(days=index)
+        comment.created = timezone.now() + datetime.timedelta(days=index)
         comment.save()
-
-
-@pytest.fixture
-def new_comment():
-    return {'text': NEW_TEXT}
 
 
 @pytest.fixture

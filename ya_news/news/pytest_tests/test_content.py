@@ -1,18 +1,28 @@
 import pytest
 
-from .conftest import ANONYMOUS, AUTHOR_CLIENT
+from news.forms import CommentForm
+
+from .conftest import ANONYMOUS, AUTHOR_CLIENT, NEWS_COUNT
 
 
-def test_news_count_order(client, home_url, bulk_news_creation):
+def test_news_count_order_and_count_on_homepage(
+        client,
+        home_url,
+        bulk_news_creation
+):
 
     response = client.get(home_url)
-    object_list = list(response.context['object_list'])
-    assert object_list == sorted(
-        object_list, key=lambda x: x.date, reverse=True
-    )
+    news_items = list(response.context['object_list'])
+    assert news_items == sorted(news_items, key=lambda x: x.date, reverse=True)
+    assert len(news_items) == NEWS_COUNT
 
 
-def test_comments_order(client, detail_url, new, multiply_comments):
+def test_comments_order_and_correct_form_type(
+        client,
+        detail_url,
+        new,
+        multiply_comments
+):
 
     response = client.get(detail_url)
     new = response.context['news']
@@ -33,4 +43,7 @@ def test_anonymous_has_no_form(
 ):
 
     response = current_client.get(detail_url)
-    assert ('form' in response.context) is status
+    form_in_context = 'form' in response.context
+    if form_in_context:
+        assert isinstance(response.context['form'], CommentForm)
+    assert form_in_context is status
